@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+	<title>图片轮播控件开发草图</title>
+	<script type="text/javascript" src="res/jquery.js"></script>
+	<script type="text/javascript" src="res/jquery.imgslider.js"></script>
+	<link rel="stylesheet" type="text/css" href="res/jquery.imgslider.css"/>
+	<script type="text/javascript">
+		$(function(){
+			//$("div.imgSlider#testid").imgslider();
+			$this=$("div.imgSlider#testid");
+			var op={currentIndex:0,imgsCount:0,defTarget:"_blank",autoSlider:{},imgShowClass:"imgShow",footerClass:"footer",titleShowClass:"titleShow",imgIndexClass:"imgIndex",selectedClass:"selected"};
+			var divStr="<div></div>";
+			var imgsCount=$this.children().size();
+			$this.wrapInner(divStr);
+			var $imgShow=$(">div:first",$this).addClass(op.imgShowClass);
+			var $footer=$(divStr).appendTo($this).addClass(op.footerClass);
+			var $titleShow=$(divStr).appendTo($this).addClass(op.titleShowClass);
+			var imgIndexStr=generateImgIndexList(imgsCount);
+			var $imgIndex=$(imgIndexStr).appendTo($this).addClass(op.imgIndexClass);
+			var $imgIndexList=$(">li",$imgIndex);
+			var $imgLinks=$(">a",$imgShow);
+			var $imgs=$(">a>img",$imgShow);
+			$imgLinks.click(function(e){
+				window.open($(this).attr("href"),$(this).attr("target")?$(this).attr("target"):op.defTarget);
+				e.preventDefault();//取消超链接的功能
+			});
+			//初始化标题,图片和索引
+			$titleShow.text($imgs.eq(op.currentIndex).attr("title"));
+			$imgIndexList.eq(op.currentIndex).addClass(op.selectedClass);
+			//$imgs.eq(op.currentIndex).show().siblings().hide();
+			$imgs.each(function(index,item){
+				op.currentIndex==index?$(item).show():$(item).hide();
+			});
+			//添加点击事件
+			$imgIndexList.click(function(){
+				op.currentIndex=$(this).text()-1;
+				//alert(op.currentIndex);
+				$titleShow.text($imgs.eq(op.currentIndex).attr("title"));
+				$imgIndexList.eq(op.currentIndex).addClass(op.selectedClass).siblings().removeClass(op.selectedClass);
+				$imgs.filter(":visible").fadeOut(2000);
+				$imgs.eq(op.currentIndex).fadeIn(2000);	
+			});
+			$titleShow.click(function(){
+				var url=$imgLinks.eq(op.currentIndex).attr("href");
+				window.open(url,$(this).attr("target")?$(this).attr("target"):op.defTarget);
+			});
+			//自动播放
+			op.autoSlider=function(){
+				op.currentIndex=op.currentIndex>=imgsCount-1?0:++op.currentIndex;
+				$imgIndexList.eq(op.currentIndex).trigger("click");
+			}
+			var autoHandler=setInterval(op.autoSlider,4000);
+			$this.hover(function(){
+				clearInterval(autoHandler);
+			},function(){
+				autoHandler=setInterval(op.autoSlider,4000);
+			});
+			//生成ul中的li*imgsCount
+			function generateImgIndexList(imgsCount){
+				var imgIndexStr="<ul>";
+				for(var i=1;i<=imgsCount;i++){
+					imgIndexStr+="<li>"+i+"</li>";
+				}
+				return imgIndexStr+="</ul>";
+			}
+		});
+
+	</script>
+</head>
+<body>
+	<span>imgslider的Zen Coding结构 其中n为自然数</span>
+	<div class="showCode">
+		div.imgSlider>(a[href=#][target=_blank]>img[src][title][alt])*n
+	</div>
+	<span>imgslider使用结构</span>
+	<div class="imgSlider" id="testid">
+		<a href="http://www.baidu.com" target="_blank"><img src="images/Tulips.jpg" alt="郁金香" title="郁金香标题" /></a>
+		<a href="#" target="_blank"><img src="images/Penguins.jpg" alt="企鹅" title="企鹅标题" /></a>
+		<a href="#" target="_blank"><img src="images/Chrysanthemum.jpg" alt="菊花" title="菊花标题" /></a>
+		<a href="#" target="_blank"><img src="images/Desert.jpg" alt="沙漠" title="沙漠标题" /></a>
+		<a href="#" target="_blank"><img src="images/Jellyfish.jpg" alt="水母" title="水母标题" /></a>
+		<a href="#" target="_blank"><img src="images/Koala.jpg" alt="考拉" title="考拉标题" /></a>
+		<a href="#" target="_blank"><img src="images/Lighthouse.jpg" alt="灯塔" title="灯塔标题" /></a>
+		<a href="#" target="_blank"><img src="images/Hydrangeas.jpg" alt="八仙花" title="八仙花标题" /></a>
+	</div>
+    <hr />
+	<span>imgslider程序自动生成结构</span>
+	<div class="imgSlider">
+		<div class="imgShow">
+			<a href="#" target="_blank"><img src="images/Tulips.jpg" alt="郁金香" title="郁金香标题" /></a>
+			<a href="#" target="_blank"><img src="images/Penguins.jpg" alt="企鹅" title="企鹅标题" /></a>
+			<a href="#" target="_blank"><img src="images/Chrysanthemum.jpg" alt="菊花" title="菊花标题" /></a>
+			<a href="#" target="_blank"><img src="images/Desert.jpg" alt="沙漠" title="沙漠标题" /></a>
+			<a href="#" target="_blank"><img src="images/Jellyfish.jpg" alt="水母" title="水母标题" /></a>
+			<a href="#" target="_blank"><img src="images/Koala.jpg" alt="考拉" title="考拉标题" /></a>
+			<a href="#" target="_blank"><img src="images/Lighthouse.jpg" alt="灯塔" title="灯塔标题" /></a>
+			<a href="#" target="_blank"><img src="images/Hydrangeas.jpg" alt="八仙花" title="八仙花标题" /></a>
+		</div>
+		<div class="footer"></div>
+		<div class="titleShow">八仙花的标题展示区</div>
+		<ul class="imgIndex">
+			<li>1</li><li>2</li><li class="selected">3</li><li>4</li>
+			<li>5</li><li>6</li><li>7</li><li>8</li>
+		</ul>
+	</div>
+</body>
+</html>
