@@ -7,7 +7,7 @@
 	$.fn.extend({
 		imgslider:function(options){
 			//全局配置项
-			var op=$.extend({defTarget:"_blank",imgShowClass:"imgShow",footerClass:"footer",titleShowClass:"titleShow",imgIndexClass:"imgIndex",selectedClass:"selected"},options);
+			var op=$.extend({defTarget:"_blank",imgShowClass:"imgShow",footerClass:"footer",titleShowClass:"titleShow",imgIndexClass:"imgIndex",selectedClass:"selected",duration:2000},options);
 			return this.each(function(){
 				initImgSlider(this);
 			})
@@ -41,9 +41,11 @@
 				$imgIndexList.click(function(){
 					currentIndex=$(this).text()-1;
 					$titleShow.text($imgs.eq(currentIndex).attr("title"));
-					$imgIndexList.eq(currentIndex).addClass(op.selectedClass).siblings().removeClass(op.selectedClass);
-					$imgs.filter(":visible").fadeOut(2000);
-					$imgs.eq(currentIndex).fadeIn(2000);	
+					//解决IE8下索引块不能轮播的BUG
+					$imgIndex[0].style.background="";
+					$imgIndexList.eq(currentIndex).addClass(op.selectedClass).siblings("."+op.selectedClass).removeClass(op.selectedClass);
+					$imgs.filter(":visible").fadeOut(op.duration);
+					$imgs.eq(currentIndex).fadeIn(op.duration);
 				});
 				//图片标题点击事件
 				$titleShow.click(function(){
@@ -55,12 +57,12 @@
 					currentIndex=currentIndex>=imgsCount-1?0:++currentIndex;
 					$imgIndexList.eq(currentIndex).trigger("click");
 				}
-				var autoHandler=setInterval(autoSlider,4000);
+				var autoHandler=setInterval(autoSlider,2*op.duration);
 				//当鼠标移上去后停止自动播放,移开后开始自动播放
 				$this.hover(function(){
 					clearInterval(autoHandler);
 				},function(){
-					autoHandler=setInterval(autoSlider,4000);
+					autoHandler=setInterval(autoSlider,2*op.duration);
 				});
 			}
 			//生成ul中imgsCount个li
