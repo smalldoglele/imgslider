@@ -26,13 +26,17 @@
 				var $imgIndexList=$(">li",$imgIndex);
 				var $imgLinks=$(">a",$imgShow);
 				var $imgs=$(">a>img",$imgShow);
+				var $imgTitles=new Array();
+				$imgs.each(function(index,item){
+					$imgTitles[index]=$(item).attr("title");
+				});
 				$imgLinks.click(function(e){
 					window.open($(this).attr("href"),$(this).attr("target")?$(this).attr("target"):op.defTarget);
 					//取消超链接的默认功能
 					e.preventDefault();
 				});
 				//初始化标题,图片和索引
-				$titleShow.text($imgs.eq(currentIndex).attr("title"));
+				$titleShow.text($imgTitles[currentIndex]);
 				$imgIndexList.eq(currentIndex).addClass(op.selectedClass);
 				$imgs.each(function(index,item){
 					currentIndex==index?$(item).show():$(item).hide();
@@ -40,12 +44,21 @@
 				//图片索引块点击事件
 				$imgIndexList.click(function(){
 					currentIndex=$(this).text()-1;
-					$titleShow.text($imgs.eq(currentIndex).attr("title"));
+					$titleShow.text($imgTitles[currentIndex]);
 					//解决IE8下索引块不能轮播的BUG
 					$imgIndex[0].style.background="";
-					$imgIndexList.eq(currentIndex).addClass(op.selectedClass).siblings("."+op.selectedClass).removeClass(op.selectedClass);
-					$imgs.filter(":visible").fadeOut(op.duration);
-					$imgs.eq(currentIndex).fadeIn(op.duration);
+					//不在使用sibling()方法 提高效率
+					$imgIndexList.each(function(index,item){
+						currentIndex==index?item.className=op.selectedClass:item.className="";
+					});
+					//遍历对象 提高效率
+					$imgs.each(function(index,item){
+						if(currentIndex==index){
+							$(item).fadeIn(op.duration);
+						}else if($this.is(":visible")){
+							$(item).fadeOut(op.duration);
+						}
+					});
 				});
 				//图片标题点击事件
 				$titleShow.click(function(){
